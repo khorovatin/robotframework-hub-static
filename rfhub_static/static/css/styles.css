@@ -1,115 +1,126 @@
 /* Main Layout */
-body,
-html {
-  height: 100%;
-  margin: 0;
-  font-family: sans-serif;
-  overflow: hidden;
-}
-.main-container {
-  display: flex;
-  height: 100%;
-}
-.nav-pane {
-  width: 400px;
-  min-width: 300px;
-  height: 100%;
-  background: #f8f9fa;
-  border-right: 1px solid #dee2e6;
-  display: flex;
-  flex-direction: column;
-}
-.nav-pane header {
-  padding: 1rem;
-  border-bottom: 1px solid #dee2e6;
-}
-.content-pane {
-  flex-grow: 1;
-}
-.content-pane iframe {
-  width: 100%;
-  height: 100%;
-  border: none;
-}
-#nav-tree {
-  flex-grow: 1;
-  overflow-y: auto;
-  padding: 0 1rem;
-}
-.search-container {
-  padding: 1rem;
-  border-bottom: 1px solid #dee2e6;
+body, html {
+    height: 100%;
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    overflow: hidden;
 }
 
-/* Tree View Styles */
+.main-container {
+    display: flex;
+    height: 100%;
+}
+
+.nav-pane {
+    width: 400px;
+    min-width: 300px;
+    height: 100%;
+    background: #f8f9fa;
+    border-right: 1px solid #dee2e6;
+    display: flex;
+    flex-direction: column;
+}
+
+.nav-pane header {
+    padding: 1rem;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.content-pane {
+    flex-grow: 1;
+}
+
+.content-pane iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
+#nav-tree {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding: 0 1rem;
+}
+
+.search-container {
+    padding: 1rem;
+    border-bottom: 1px solid #dee2e6;
+}
+
+/* Tree View & Toggle Styles */
 .tree ul {
-  list-style-type: none;
-  padding-left: 20px;
-  margin: 0;
+    list-style-type: none;
+    padding-left: 20px;
+    margin: 0;
+}
+.tree .top-level {
+    padding-left: 0;
 }
 .tree li {
-  margin: 2px 0;
+    margin: 2px 0;
 }
 .tree .toggle {
-  cursor: pointer;
-  user-select: none;
-  display: inline-block;
-  padding: 4px;
+    cursor: pointer;
+    user-select: none;
+    display: inline-block;
+    padding: 4px;
 }
 .tree .toggle:hover {
-  background-color: #e9ecef;
-  border-radius: 4px;
+    background-color: #e9ecef;
+    border-radius: 4px;
+}
+.tree h4.toggle {
+    font-size: 1.1rem;
+    margin: 10px 0 5px -4px;
+    width: calc(100% + 8px);
 }
 
 /* Icons */
-.tree .folder::before {
-  content: "📂";
-  margin-right: 5px;
-}
-.tree .file::before {
-  content: "📄";
-  margin-right: 5px;
-}
-.tree .library::before {
-  content: "📚";
-  margin-right: 5px;
-}
-.collapsed > .toggle.folder::before {
-  content: "📁";
-}
+.tree h4.toggle::before { content: '►'; display: inline-block; transition: transform 0.2s; font-size: 0.8em; margin-right: 8px; }
+.tree .folder::before { content: '📁'; margin-right: 5px; }
+.tree .file::before { content: '📄'; margin-right: 5px; }
+.tree .library::before { content: '📚'; margin-right: 5px; }
+.collapsed > .toggle.folder::before { content: '📂'; }
 
-/* Collapsed State */
-.tree .collapsed > ul,
-.tree .collapsed > .nested {
-  display: none;
+/* --- START: THE FIX --- */
+/* Correctly handle the display of nested content for ALL collapsed items */
+.tree li.collapsed > ul.nested,
+.tree li.collapsed > div.nested {
+    display: none;
 }
+/* Correctly handle the arrow rotation for top-level categories */
+.tree .top-level > li:not(.collapsed) > h4.toggle::before {
+    transform: rotate(90deg);
+}
+/* --- END: THE FIX --- */
+
 
 /* Link Styles */
 .tree a {
-  text-decoration: none;
-  color: #0056b3;
-  display: block;
-  padding: 4px 0;
+    text-decoration: none;
+    color: #0056b3;
+    display: block;
+    padding: 4px 0;
 }
 .tree a:hover {
-  text-decoration: underline;
+    text-decoration: underline;
 }
 .tree a.overview em {
-  font-style: italic;
-  color: #555;
+    font-style: italic;
+    color: #555;
 }
 
 /* Search Results */
 #search-results ul {
-  list-style: none;
-  padding-left: 0;
+    list-style: none;
+    padding-left: 0;
 }
 .library-name {
-  font-weight: normal;
-  color: #6c757d;
-  font-size: 0.9em;
+    font-weight: normal;
+    color: #6c757d;
+    font-size: 0.9em;
 }
 .no-results {
-  padding: 1rem;
-  color: #6c757d;
+    padding: 1rem;
+    color: #6c757d;
 }

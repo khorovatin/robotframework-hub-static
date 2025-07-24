@@ -8,19 +8,14 @@
     <link rel="stylesheet" href="static/css/styles.css">
 </head>
 <body>
-    {#--- Recursive Macro to Render the Resource Tree ---#}
+    {#--- Recursive Macro to Render Folder/File Trees ---#}
     {% macro render_tree(tree_node) %}
-        <ul>
-        {#-- Render Folders First --#}
+        <ul class="nested">
         {% for name, subtree in tree_node|dictsort %}
             {% if name != '__files__' %}
-            <li class="collapsed">
-                <span class="toggle folder">{{ name }}</span>
-                {{ render_tree(subtree) }}
-            </li>
+            <li class="collapsed"><span class="toggle folder">{{ name }}</span>{{ render_tree(subtree) }}</li>
             {% endif %}
         {% endfor %}
-        {#-- Then Render Files in the Current Directory --#}
         {% for name, resource in tree_node.get('__files__', [])|sort %}
             <li class="collapsed">
                 <span class="toggle file">{{ name }}</span>
@@ -42,22 +37,34 @@
             <div id="nav-tree" class="tree">
                 <div id="search-results" style="display:none;"></div>
                 <div id="keyword-navigation">
-                    <h4>Libraries</h4>
-                    <ul>
-                    {% for lib in data.libraries %}
+                    <ul class="top-level">
                         <li class="collapsed">
-                            <span class="toggle library">{{ lib.name }}</span>
-                            <ul class="nested">
-                                <li><a href="{{ lib.url }}" target="doc-frame" class="overview"><em>Overview</em></a></li>
-                                {% for kw in lib.keywords|sort(attribute='name') %}
-                                <li><a href="{{ kw.url }}" target="doc-frame">{{ kw.name }}</a></li>
+                            <h4 class="toggle category">Libraries</h4>
+                            <div class="nested">
+                                <ul>
+                                {% for lib in data.libraries %}
+                                    <li class="collapsed">
+                                        <span class="toggle library">{{ lib.name }}</span>
+                                        <ul class="nested">
+                                            <li><a href="{{ lib.url }}" target="doc-frame" class="overview"><em>Overview</em></a></li>
+                                            {% for kw in lib.keywords|sort(attribute='name') %}
+                                            <li><a href="{{ kw.url }}" target="doc-frame">{{ kw.name }}</a></li>
+                                            {% endfor %}
+                                        </ul>
+                                    </li>
                                 {% endfor %}
-                            </ul>
+                                </ul>
+                            </div>
                         </li>
-                    {% endfor %}
+                        <li class="collapsed">
+                            <h4 class="toggle category">Resources</h4>
+                            {{ render_tree(data.resource_tree) }}
+                        </li>
+                        <li class="collapsed">
+                            <h4 class="toggle category">Page Objects</h4>
+                            {{ render_tree(data.page_object_tree) }}
+                        </li>
                     </ul>
-                    <h4>Resource Files</h4>
-                    {{ render_tree(data.resource_tree) }}
                 </div>
             </div>
         </div>
