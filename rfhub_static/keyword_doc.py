@@ -18,7 +18,9 @@ from rfhub_static.version import __version__ as pkg_version
 libdoc_instance = LibDoc()
 LOGGER.unregister_console_logger()
 
+
 def generate_doc_file(lib_file_or_resource: str, out_dir: str, out_file: str, lib_name: str) -> Dict:
+    """Generates a doc file and returns a dictionary of its keywords."""
     result_dict = {}
     out = StringIO()
     err = StringIO()
@@ -50,7 +52,9 @@ def generate_doc_file(lib_file_or_resource: str, out_dir: str, out_file: str, li
     err.close()
     return result_dict
 
+
 def generate_doc_builtin(out_path: str) -> Dict:
+    """Generates documentation for Robot Framework's built-in libraries."""
     result_dict = {}
     print("\nProcessing Built-in Libraries...")
     for lib in sorted(STDLIBS):
@@ -59,7 +63,9 @@ def generate_doc_builtin(out_path: str) -> Dict:
             result_dict.update(generate_doc_file(lib, out_path, file_path, lib))
     return result_dict
 
+
 def get_robot_modules() -> List[str]:
+    """Finds installed Python packages that are Robot Framework libraries."""
     library_names = []
     for dist in importlib.metadata.distributions():
         is_robot_lib = any('robotframework' in req for req in (dist.requires or []))
@@ -71,7 +77,9 @@ def get_robot_modules() -> List[str]:
                         library_names.append(lib_name)
     return sorted(list(set(library_names)))
 
+
 def generate_doc_libraries(out_path: str) -> Dict:
+    """Generates documentation for all installed Robot Framework libraries."""
     result_dict = {}
     found_modules = get_robot_modules()
     print(f"\nProcessing {len(found_modules)} Installed Libraries: {found_modules}")
@@ -80,7 +88,9 @@ def generate_doc_libraries(out_path: str) -> Dict:
         result_dict.update(generate_doc_file(lib_name, out_path, out_file, lib_name))
     return result_dict
 
+
 def get_resource_file_list(directory_path: str) -> List[str]:
+    """Recursively finds all Robot Framework resource files in a directory."""
     file_list = []
     if not os.path.isdir(directory_path):
         return []
@@ -90,22 +100,27 @@ def get_resource_file_list(directory_path: str) -> List[str]:
                 file_list.append(os.path.join(root, name))
     return file_list
 
+
 def generate_doc_from_path(in_path: str, out_path: str, category_name: str) -> Dict:
+    """Generic function to generate docs for a category from a given input path."""
     print(f"\nProcessing {category_name} from '{in_path}'...")
     file_list = get_resource_file_list(in_path)
     result_dict = {}
     in_path_full = os.path.abspath(in_path)
     out_path_full = os.path.abspath(out_path)
-    
+
     for file in sorted(file_list):
         rel_path_to_file = os.path.relpath(file, in_path_full)
         base_name, _ = os.path.splitext(rel_path_to_file)
+        # Place generated files in a subdirectory named after their category
         out_file = os.path.join(out_path_full, category_name, f"{base_name}.html")
         resource_name = rel_path_to_file
         result_dict.update(generate_doc_file(file, out_path_full, out_file, resource_name))
     return result_dict
 
+
 def _build_resource_tree(resource_list: List[Dict]) -> Dict[str, Any]:
+    """Converts a flat list of resources into a nested dictionary for the tree view."""
     tree = {}
     for resource in resource_list:
         parts = resource["name"].replace("\\", "/").split("/")
@@ -116,25 +131,28 @@ def _build_resource_tree(resource_list: List[Dict]) -> Dict[str, Any]:
         file_list.append((parts[-1], resource))
     return tree
 
+
 def create_index_page(out_path: str, template_directory: str, all_docs: Dict) -> None:
+    """Creates the main index.html file with embedded search data and hierarchical trees."""
     search_data = []
+    # Consolidate all keywords from all categories for the search index
     for category_items in all_docs.values():
         for item in category_items:
             for kw in item.get('keywords', []):
                 search_data.append({'name': kw['name'], 'url': kw['url'], 'library': item['name']})
-    
+
     search_json = json.dumps(search_data, indent=None)
-    
+
     resource_tree = _build_resource_tree(all_docs.get("resources", []))
     page_object_tree = _build_resource_tree(all_docs.get("page_objects", []))
 
     env = Environment(loader=FileSystemLoader(template_directory), autoescape=select_autoescape(['html']))
     template = env.get_template("index.html")
-    
+
     result = template.render(
         data={
-            "version": pkg_version, 
-            "libraries": all_docs.get("libraries", []), 
+            "version": pkg_version,
+            "libraries": all_docs.get("libraries", []),
             "resource_tree": resource_tree,
             "page_object_tree": page_object_tree,
             "search_json": search_json
@@ -144,39 +162,53 @@ def create_index_page(out_path: str, template_directory: str, all_docs: Dict) ->
         f.write(result)
     print("\nCreated index.html successfully.")
 
+
 def do_it(input_paths: List[str], out_path: str) -> None:
+    """Main execution function to generate all documentation."""
     for path in input_paths:
         if not os.path.isdir(path):
             sys.exit(f"ERROR: Input path '{path}' not found or is not a directory.")
-    
+
     if os.path.exists(out_path):
         shutil.rmtree(out_path)
     os.makedirs(out_path)
-    
+
     pkg_dir = os.path.dirname(os.path.realpath(__file__))
     shutil.copytree(os.path.join(pkg_dir, 'static'), os.path.join(out_path, 'static'), dirs_exist_ok=True)
-    
+
+    # --- START: THE FIX ---
+    # Correctly combine built-in and installed libraries into a single dictionary
     lib_dict = {**generate_doc_builtin(out_path), **generate_doc_libraries(out_path)}
+
+    # Process Resources and Page Objects from their respective paths
     res_dict = generate_doc_from_path(input_paths[0], out_path, "resources") if len(input_paths) > 0 else {}
     po_dict = generate_doc_from_path(input_paths[1], out_path, "page_objects") if len(input_paths) > 1 else {}
-    
+
+    # Consolidate all documentation into a single structure
     all_docs = {
         "libraries": sorted(lib_dict.values(), key=lambda x: x['name']),
         "resources": sorted(res_dict.values(), key=lambda x: x['name']),
         "page_objects": sorted(po_dict.values(), key=lambda x: x['name'])
     }
-    
+    # --- END: THE FIX ---
+
     create_index_page(out_path, os.path.join(pkg_dir, 'templates'), all_docs)
     print('\nGeneration complete.')
 
+
 def kw_doc_gen():
+    """CLI entry point."""
     if len(sys.argv) < 3:
         prg_name = os.path.basename(sys.argv[0])
         print(f"Usage: {prg_name} <output_directory> <resources_path> [<page_objects_path>]")
         print("\nExample:")
         print(f"  {prg_name} docs/ my_project/resources/ my_project/pages/")
         sys.exit(2)
+
+    # Correctly parse arguments: output dir is first, followed by input paths
     do_it(sys.argv[2:], sys.argv[1])
+
 
 if __name__ == '__main__':
     kw_doc_gen()
+
