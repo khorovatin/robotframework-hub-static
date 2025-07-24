@@ -1,0 +1,115 @@
+/* Main Layout */
+body,
+html {
+  height: 100%;
+  margin: 0;
+  font-family: sans-serif;
+  overflow: hidden;
+}
+.main-container {
+  display: flex;
+  height: 100%;
+}
+.nav-pane {
+  width: 400px;
+  min-width: 300px;
+  height: 100%;
+  background: #f8f9fa;
+  border-right: 1px solid #dee2e6;
+  display: flex;
+  flex-direction: column;
+}
+.nav-pane header {
+  padding: 1rem;
+  border-bottom: 1px solid #dee2e6;
+}
+.content-pane {
+  flex-grow: 1;
+}
+.content-pane iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+#nav-tree {
+  flex-grow: 1;
+  overflow-y: auto;
+  padding: 0 1rem;
+}
+.search-container {
+  padding: 1rem;
+  border-bottom: 1px solid #dee2e6;
+}
+
+/* Tree View Styles */
+.tree ul {
+  list-style-type: none;
+  padding-left: 20px;
+  margin: 0;
+}
+.tree li {
+  margin: 2px 0;
+}
+.tree .toggle {
+  cursor: pointer;
+  user-select: none;
+  display: inline-block;
+  padding: 4px;
+}
+.tree .toggle:hover {
+  background-color: #e9ecef;
+  border-radius: 4px;
+}
+
+/* Icons */
+.tree .folder::before {
+  content: "📂";
+  margin-right: 5px;
+}
+.tree .file::before {
+  content: "📄";
+  margin-right: 5px;
+}
+.tree .library::before {
+  content: "📚";
+  margin-right: 5px;
+}
+.collapsed > .toggle.folder::before {
+  content: "📁";
+}
+
+/* Collapsed State */
+.tree .collapsed > ul,
+.tree .collapsed > .nested {
+  display: none;
+}
+
+/* Link Styles */
+.tree a {
+  text-decoration: none;
+  color: #0056b3;
+  display: block;
+  padding: 4px 0;
+}
+.tree a:hover {
+  text-decoration: underline;
+}
+.tree a.overview em {
+  font-style: italic;
+  color: #555;
+}
+
+/* Search Results */
+#search-results ul {
+  list-style: none;
+  padding-left: 0;
+}
+.library-name {
+  font-weight: normal;
+  color: #6c757d;
+  font-size: 0.9em;
+}
+.no-results {
+  padding: 1rem;
+  color: #6c757d;
+}

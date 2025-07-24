@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Robot Framework Keyword Documentation</title>
+    <link rel="stylesheet" href="static/css/bootstrap.min.css">
+    <link rel="stylesheet" href="static/css/styles.css">
+</head>
+<body>
+    {#--- Recursive Macro to Render the Resource Tree ---#}
+    {% macro render_tree(tree_node) %}
+        <ul>
+        {#-- Render Folders First --#}
+        {% for name, subtree in tree_node|dictsort %}
+            {% if name != '__files__' %}
+            <li class="collapsed">
+                <span class="toggle folder">{{ name }}</span>
+                {{ render_tree(subtree) }}
+            </li>
+            {% endif %}
+        {% endfor %}
+        {#-- Then Render Files in the Current Directory --#}
+        {% for name, resource in tree_node.get('__files__', [])|sort %}
+            <li class="collapsed">
+                <span class="toggle file">{{ name }}</span>
+                <ul class="nested">
+                    <li><a href="{{ resource.url }}" target="doc-frame" class="overview"><em>Overview</em></a></li>
+                    {% for kw in resource.keywords|sort(attribute='name') %}
+                    <li><a href="{{ kw.url }}" target="doc-frame">{{ kw.name }}</a></li>
+                    {% endfor %}
+                </ul>
+            </li>
+        {% endfor %}
+        </ul>
+    {% endmacro %}
+
+    <div class="main-container">
+        <div class="nav-pane">
+            <header><h3>Keyword Docs</h3><p class="small text-muted">v{{ data.version }}</p></header>
+            <div class="search-container"><input type="text" id="search-input" class="form-control" placeholder="Search keywords..."></div>
+            <div id="nav-tree" class="tree">
+                <div id="search-results" style="display:none;"></div>
+                <div id="keyword-navigation">
+                    <h4>Libraries</h4>
+                    <ul>
+                    {% for lib in data.libraries %}
+                        <li class="collapsed">
+                            <span class="toggle library">{{ lib.name }}</span>
+                            <ul class="nested">
+                                <li><a href="{{ lib.url }}" target="doc-frame" class="overview"><em>Overview</em></a></li>
+                                {% for kw in lib.keywords|sort(attribute='name') %}
+                                <li><a href="{{ kw.url }}" target="doc-frame">{{ kw.name }}</a></li>
+                                {% endfor %}
+                            </ul>
+                        </li>
+                    {% endfor %}
+                    </ul>
+                    <h4>Resource Files</h4>
+                    {{ render_tree(data.resource_tree) }}
+                </div>
+            </div>
+        </div>
+        <div class="content-pane"><iframe name="doc-frame" src="about:blank"></iframe></div>
+    </div>
+    <script>const RFW_SEARCH_DATA = {{ data.search_json|safe }};</script>
+    <script src="https://unpkg.com/lunr/lunr.min.js"></script>
+    <script src="static/js/main.js"></script>
+</body>
+</html>
