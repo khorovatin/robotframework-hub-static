@@ -1,0 +1,60 @@
+[build-system]
+requires = ["setuptools>=45", "wheel", "setuptools_scm[toml]>=6.2"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "robotframework-hub-static"
+dynamic = ["version"]
+description = "Create robot keyword documentation as static HTML"
+readme = "README.md"
+license = {text = "Apache License 2.0"}
+authors = [
+    {name = "Bryan Oakley", email = "bryan.oakley@gmail.com"},
+]
+maintainers = [
+    {name = "Bert Lindemann", email = "bert.lindemann@gmail.com"},
+]
+keywords = ["robotframework"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: OS Independent",
+    "Framework :: Robot Framework",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Testing",
+    "Topic :: Software Development :: Quality Assurance",
+    "Intended Audience :: Developers",
+]
+requires-python = ">=3.8"
+dependencies = [
+    "Jinja2>=3.0.0",
+    "robotframework>=2.8.5",
+]
+
+[project.optional-dependencies]
+test = [
+    "robotframework-requests",
+]
+
+[project.urls]
+Homepage = "https://github.com/bli74/robotframework-hub-static"
+Repository = "https://github.com/bli74/robotframework-hub-static"
+Issues = "https://github.com/bli74/robotframework-hub-static/issues"
+
+[project.scripts]
+keyword_doc = "rfhub_static.keyword_doc:kw_doc_gen"
+
+[tool.setuptools]
+packages = ["rfhub_static"]
+include-package-data = true
+
+[tool.setuptools.package-data]
+"*" = ["static/*", "static/css/*", "static/js/*", "templates/*"]
+
+[tool.setuptools.dynamic]
+version = {attr = "rfhub_static.version.__version__"}

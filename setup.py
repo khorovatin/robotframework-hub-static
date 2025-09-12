@@ -14,7 +14,7 @@ exec(open(filename).read())
 
 setup_requires_packages: list = ['wheel']
 install_requires_packages: list = [
-    'Jinja2>=2.11.3',
+    'Jinja2>=3.0.0',
     'robotframework>=2.8.5'
 ]
 test_requires_packages: list = [
