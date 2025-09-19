@@ -176,7 +176,6 @@ def do_it(input_paths: List[str], out_path: str) -> None:
     pkg_dir = os.path.dirname(os.path.realpath(__file__))
     shutil.copytree(os.path.join(pkg_dir, 'static'), os.path.join(out_path, 'static'), dirs_exist_ok=True)
 
-    # --- START: THE FIX ---
     # Correctly combine built-in and installed libraries into a single dictionary
     lib_dict = {**generate_doc_builtin(out_path), **generate_doc_libraries(out_path)}
 
@@ -190,7 +189,6 @@ def do_it(input_paths: List[str], out_path: str) -> None:
         "resources": sorted(res_dict.values(), key=lambda x: x['name']),
         "page_objects": sorted(po_dict.values(), key=lambda x: x['name'])
     }
-    # --- END: THE FIX ---
 
     create_index_page(out_path, os.path.join(pkg_dir, 'templates'), all_docs)
     print('\nGeneration complete.')

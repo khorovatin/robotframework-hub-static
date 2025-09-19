@@ -2,7 +2,8 @@
 body, html {
     height: 100%;
     margin: 0;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-family: "Noto Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    color: white;
     overflow: hidden;
 }
 
@@ -15,7 +16,7 @@ body, html {
     width: 400px;
     min-width: 300px;
     height: 100%;
-    background: #f8f9fa;
+    background: #003C71;
     border-right: 1px solid #dee2e6;
     display: flex;
     flex-direction: column;
@@ -67,6 +68,7 @@ body, html {
 }
 .tree .toggle:hover {
     background-color: #e9ecef;
+    color: #003C71;
     border-radius: 4px;
 }
 .tree h4.toggle {
@@ -98,7 +100,7 @@ body, html {
 /* Link Styles */
 .tree a {
     text-decoration: none;
-    color: #0056b3;
+    color: ghostwhite;
     display: block;
     padding: 4px 0;
 }
@@ -107,7 +109,7 @@ body, html {
 }
 .tree a.overview em {
     font-style: italic;
-    color: #555;
+    color: ghostwhite;
 }
 
 /* Search Results */
@@ -117,10 +119,10 @@ body, html {
 }
 .library-name {
     font-weight: normal;
-    color: #6c757d;
+    color: ghostwhite;
     font-size: 0.9em;
 }
 .no-results {
     padding: 1rem;
-    color: #6c757d;
+    color: lightgray;
 }
